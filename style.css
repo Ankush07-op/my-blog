@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body{
+    margin: 0;
+    font-size: Arial, Helvetica, sans-serif;
+    font-family: 'Poppins', sans-serif;
+    background: #f4f4f4;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+
+header{
+    background: #222;
+    color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a{
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 14px;
+}
+
+nav a:hover{
+    color: yellow;
+}
+
+.container{
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px 0;
+}
+
+.blog-box{
+    background: white;
+    margin: 15px 0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.blog-box h2{
+    margin: 0;
+}
+
+.blog-box p{
+    color: #444;
+}
+
+.read-btn{
+    display: inline-block;
+    background: #111;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.read-btn:hover{
+    background: orange;
+}
+
+section div{
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+section div:hover{
+    transform: translateY(-5px);
+}
+
+button{
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: #0a58ca;
+    color: white;
+    margin-top: 10px;
+}
+
+button:hover{
+    background-color: #084298;
+}
+
+.hero{
+    background: linear-gradient(135deg, #0a58ca, #084298);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.hero h2{
+    font-size: 2.2rem;
+}
+
+.hero p{
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+.post{
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.post.show{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+footer{
+    text-align: center;
+    padding: 20px;
+    background: #111;
+    color: white;
+    margin-top: 40px;
+}
+
+@media(max-width:600px){
+    header{
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav{
+        margin-top: 15px;
+    }
+
+    nav a{
+        display: block;
+        margin: 8px 0;
+    }
+
+    section{
+        padding: 15px;
+    }
+}
+
+footer{
+    margin-top: auto;
+}
+
+.dark-mode{
+    background-color: #121212;
+    color: white;
+}
+
+.dark-mode header,
+.dark-mode footer{
+    background-color: #000;
+}
+
+.dark-mode section div{
+    background-color: #1e1e1e;
+}
+
+input, textarea{
+    width: 100%;
+    padding: 8px;
+}
+
+#comments div{
+    background: #fff;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+body.dark {
+    background-color: #121212;
+    color: white;
+}
+
+body.dark .post{
+    background: #1e1e1e;
+}
+
+.filters{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filters button{
+    padding: 8px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #0a58ca;
+    color: white;
+}
+
+#searchInput{
+    width: 60%;
+    padding: 10px;
+    margin: 15px auto;
+    display: block;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+form{
+    max-width: 500px;
+    margin: auto;
+}
+
+form input, form textarea{
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form textarea{
+    height: 120px;
+}

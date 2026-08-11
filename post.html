@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6-5-0/css/all.min.css">
+
+</head>
+<body>
+    <header>
+
+        <h1>My Blog</h1>
+
+        <nav>
+            <a href="index.html"><i class="fa fa-home"></i>Home</a>
+            <a href="about.html"><i class="fa fa-user"></i>About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i>Contact</a>
+        </nav>
+
+        <button onclick="toggleDarkMode()">Dark Mode</button>
+
+    </header>
+
+    <section>
+        <h2>My First Blog Post</h2>
+        <p>
+            This is full content of my blog post. Here you can write detailed explanations, 
+            examples, and share your knowledge with readers.
+        </p>
+
+        <p>
+            Blogging helps you improve writing skills and also builds your technical portfolio.
+        </p>
+
+        <hr>
+
+        <h3>Leave a Comment</h3>
+
+        <input type="text" id="name" placeholder="Your Name"><br><br>
+
+        <textarea id="comment" placeholder="Write your comment..."></textarea><br><br>
+
+        <button onclick="addComment()">Post Comment</button>
+
+        <div id="comments"></div>
+
+        <a href="index.html">Back to Home</a>
+    </section>
+
+    <script src="script.js"></script>
+
+    <footer>
+        <p>&copy; 2026 My Blog | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>

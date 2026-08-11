@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6-5-0/css/all.min.css">
+
+</head>
+<body>
+    <header>
+
+        <h1>My Blog</h1>
+
+        <nav>
+            <a href="index.html"><i class="fa fa-home"></i>Home</a>
+            <a href="about.html"><i class="fa fa-user"></i>About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i>Contact</a>
+        </nav>
+
+        <button onclick="toggleDarkMode()">Dark Mode</button>
+    </header>
+
+    <section class="hero">
+        <h2>Welcome to My Blog</h2>
+        <p>
+            I write about Web Development, Technology and Learning
+        </p>
+    </section>
+
+    <section>
+
+        <input type="text" id="searchInput" placeholder="Search blog..." 
+                onkeyup="searchPosts()">
+
+        <h2>Latest Blogs</h2>
+        
+        <div class="filters">
+            <button onclick="filtersPosts('all')">All</button>
+            <button onclick="filtersPosts('tech')">Tech</button>
+            <button onclick="filtersPosts('personal')">Personal</button>
+        </div>
+
+        <div class="post tech">
+            <h3>My First Blog</h3>
+            <p>Learning HTML, CSS, and Javascript...</p>
+            <a href="post.html">Read More</a>
+        </div>
+
+        <div class="post personal">
+            <h3>My College Life</h3>
+            <p>Sharing my personal experinces...</p>
+            <a href="post.html">Read More</a>
+        </div>
+
+        <div class="post tech">
+            <h3>JavaScript Basics</h3>
+            <p>Understanding JS step by step...</p>
+            <a href="post.html">Read More</a>
+        </div>
+
+    </section>
+
+    <script src="script.js"></script>
+
+    <footer>
+        <p>&copy; 2026 My Blog | All Rights Reserved</p>
+    </footer>
+</body>
+</html>
