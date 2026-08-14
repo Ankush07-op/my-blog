@@ -3,58 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog Post</title>
+    <title>Blog Post - My Blog</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6-5-0/css/all.min.css">
-
 </head>
 <body>
     <header>
-
-        <h1>My Blog</h1>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-code"></i> My Blog
+        </a>
 
         <nav>
-            <a href="index.html"><i class="fa fa-home"></i>Home</a>
-            <a href="about.html"><i class="fa fa-user"></i>About</a>
-            <a href="contact.html"><i class="fa fa-envelope"></i>Contact</a>
+            <a href="index.html"><i class="fa fa-home"></i> Home</a>
+            <a href="about.html"><i class="fa fa-user"></i> About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i> Contact</a>
+            <a href="admin.html"><i class="fa fa-shield-halved"></i> Admin</a>
         </nav>
 
-        <button onclick="toggleDarkMode()">Dark Mode</button>
-
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleDarkMode()">
+            <i class="fa fa-moon"></i> Dark Mode
+        </button>
     </header>
 
-    <section>
-        <h2>My First Blog Post</h2>
-        <p>
-            This is full content of my blog post. Here you can write detailed explanations, 
-            examples, and share your knowledge with readers.
-        </p>
+    <main class="container single-post-container">
+        <a href="index.html" class="back-link">
+            <i class="fa fa-arrow-left"></i> Back to All Articles
+        </a>
 
-        <p>
-            Blogging helps you improve writing skills and also builds your technical portfolio.
-        </p>
+        <article class="post-header">
+            <h1 id="postTitle">Loading Blog Post...</h1>
+            <div id="postMeta" class="post-meta">
+                <span><i class="fa fa-user"></i> Admin</span>
+                <span><i class="fa fa-calendar"></i> Feb 2026</span>
+            </div>
+        </article>
 
-        <hr>
+        <img id="postCover" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Blog Banner" class="post-cover-image">
 
-        <h3>Leave a Comment</h3>
+        <div id="postContent" class="post-body">
+            <p>Loading post content from database...</p>
+        </div>
 
-        <input type="text" id="name" placeholder="Your Name"><br><br>
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <h3><i class="fa fa-comments"></i> Reader Discussion & Comments</h3>
 
-        <textarea id="comment" placeholder="Write your comment..."></textarea><br><br>
+            <div class="comment-form">
+                <input type="text" id="commentName" class="form-control" placeholder="Your Name" required>
+                <textarea id="commentContent" class="form-control" placeholder="Share your thoughts or feedback..." required></textarea>
+                <button type="button" class="btn-primary" onclick="addComment()">
+                    <i class="fa fa-paper-plane"></i> Post Comment
+                </button>
+            </div>
 
-        <button onclick="addComment()">Post Comment</button>
-
-        <div id="comments"></div>
-
-        <a href="index.html">Back to Home</a>
-    </section>
-
-    <script src="script.js"></script>
+            <div id="commentsList" class="comments-list">
+                <!-- Dynamically loaded comments -->
+            </div>
+        </section>
+    </main>
 
     <footer>
         <p>&copy; 2026 My Blog | All Rights Reserved</p>
     </footer>
 
+    <script src="script.js"></script>
 </body>
 </html>

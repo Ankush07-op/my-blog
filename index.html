@@ -3,71 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog</title>
+    <meta name="description" content="A modern blog exploring Web Development, Technology, Programming, and Personal Learning Journeys.">
+    <title>My Blog - Web Development & Tech Articles</title>
 
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Design System Stylesheet -->
     <link rel="stylesheet" href="style.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6-5-0/css/all.min.css">
-
 </head>
 <body>
     <header>
-
-        <h1>My Blog</h1>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-code"></i> My Blog
+        </a>
 
         <nav>
-            <a href="index.html"><i class="fa fa-home"></i>Home</a>
-            <a href="about.html"><i class="fa fa-user"></i>About</a>
-            <a href="contact.html"><i class="fa fa-envelope"></i>Contact</a>
+            <a href="index.html" class="active"><i class="fa fa-home"></i> Home</a>
+            <a href="about.html"><i class="fa fa-user"></i> About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i> Contact</a>
+            <a href="admin.html"><i class="fa fa-shield-halved"></i> Admin</a>
         </nav>
 
-        <button onclick="toggleDarkMode()">Dark Mode</button>
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleDarkMode()">
+            <i class="fa fa-moon"></i> Dark Mode
+        </button>
     </header>
 
-    <section class="hero">
-        <h2>Welcome to My Blog</h2>
-        <p>
-            I write about Web Development, Technology and Learning
-        </p>
-    </section>
+    <main class="container">
+        <!-- Hero Banner -->
+        <section class="hero">
+            <h2>Welcome to My Blog</h2>
+            <p>I write about Web Development, Modern Technology, Software Engineering, and Personal Growth.</p>
+        </section>
 
-    <section>
+        <!-- Controls (Search & Category Filters) -->
+        <section class="controls-section">
+            <div class="search-box">
+                <i class="fa fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search blog articles by title or keyword..." autocomplete="off">
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterPosts('all')"><i class="fa fa-layer-group"></i> All Posts</button>
+                <button class="filter-btn" onclick="filterPosts('tech')"><i class="fa fa-laptop-code"></i> Tech</button>
+                <button class="filter-btn" onclick="filterPosts('personal')"><i class="fa fa-user-pen"></i> Personal</button>
+            </div>
+        </section>
 
-        <input type="text" id="searchInput" placeholder="Search blog..." 
-                onkeyup="searchPosts()">
-
-        <h2>Latest Blogs</h2>
-        
-        <div class="filters">
-            <button onclick="filtersPosts('all')">All</button>
-            <button onclick="filtersPosts('tech')">Tech</button>
-            <button onclick="filtersPosts('personal')">Personal</button>
-        </div>
-
-        <div class="post tech">
-            <h3>My First Blog</h3>
-            <p>Learning HTML, CSS, and Javascript...</p>
-            <a href="post.html">Read More</a>
-        </div>
-
-        <div class="post personal">
-            <h3>My College Life</h3>
-            <p>Sharing my personal experinces...</p>
-            <a href="post.html">Read More</a>
-        </div>
-
-        <div class="post tech">
-            <h3>JavaScript Basics</h3>
-            <p>Understanding JS step by step...</p>
-            <a href="post.html">Read More</a>
-        </div>
-
-    </section>
-
-    <script src="script.js"></script>
+        <!-- Dynamic Blog Posts Grid -->
+        <section>
+            <div id="postsContainer" class="posts-grid">
+                <!-- Dynamically rendered via script.js -->
+            </div>
+        </section>
+    </main>
 
     <footer>
-        <p>&copy; 2026 My Blog | All Rights Reserved</p>
+        <p>&copy; 2026 My Blog | Designed with Node.js & MongoDB</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

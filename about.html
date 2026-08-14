@@ -3,40 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me</title>
+    <title>About Me - My Blog</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6-5-0/css/all.min.css">
-
 </head>
 <body>
     <header>
-
-        <h1>My Blog</h1>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-code"></i> My Blog
+        </a>
 
         <nav>
-            <a href="index.html"><i class="fa fa-home"></i>Home</a>
-            <a href="about.html"><i class="fa fa-user"></i>About</a>
-            <a href="contact.html"><i class="fa fa-envelope"></i>Contact</a>
+            <a href="index.html"><i class="fa fa-home"></i> Home</a>
+            <a href="about.html" class="active"><i class="fa fa-user"></i> About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i> Contact</a>
+            <a href="admin.html"><i class="fa fa-shield-halved"></i> Admin</a>
         </nav>
 
-        <button onclick="toggleDarkMode()">Dark Mode</button>
-
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleDarkMode()">
+            <i class="fa fa-moon"></i> Dark Mode
+        </button>
     </header>
 
-    <section>
-        <h2>About Me</h2>
-        <p>
-            Hello! I am Ankush Pandey, a Computer Science student.
-            This blog is created to share my learning journey,
-            technical knowledge, and project experiences.
-        </p>
-    </section>
+    <main class="container">
+        <div class="card-box" style="text-align:center;">
+            <img src="ankush-pandey-photo.jpg" alt="Ankush Pandey Profile" style="width:130px; height:130px; border-radius:50%; object-fit:cover; margin-bottom:1.2rem; border:3.5px solid var(--accent-primary); box-shadow:var(--shadow-md);">
+            
+            <h2>Hello, I'm Ankush! 👋</h2>
+            <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:1.5rem;">Full Stack Developer & Tech Enthusiast</p>
 
-    <script src="script.js"></script>
+            <p style="text-align:left; line-height:1.7; margin-bottom:1.5rem;">
+                Welcome to my personal tech blog! I am passionate about web development, building scalable web applications with Node.js, Express, and MongoDB, and sharing everything I learn along the way.
+            </p>
+
+            <h3 style="font-size:1.2rem; text-align:left; margin-bottom:0.8rem;"><i class="fa fa-screwdriver-wrench"></i> Core Tech Stack</h3>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:2rem;">
+                <span class="post-badge">JavaScript (ES6+)</span>
+                <span class="post-badge">Node.js</span>
+                <span class="post-badge">Express</span>
+                <span class="post-badge">MongoDB</span>
+                <span class="post-badge">HTML5 & CSS3</span>
+                <span class="post-badge">Git & GitHub</span>
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:1.2rem;">
+                <a href="https://github.com/Ankush07-op/my-blog" target="_blank" class="btn-primary" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                    <i class="fa-brands fa-github"></i> GitHub Repo
+                </a>
+                <a href="contact.html" class="theme-toggle-btn">
+                    <i class="fa fa-envelope"></i> Get In Touch
+                </a>
+            </div>
+        </div>
+    </main>
 
     <footer>
-        <p>&copy; 2026 My Blog | All Rights Reserved</p>
+        <p>&copy; 2026 My Blog | Designed with Node.js & MongoDB</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
