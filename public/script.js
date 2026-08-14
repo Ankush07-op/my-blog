@@ -69,7 +69,7 @@ async function fetchPosts(category = 'all', search = '') {
 
   // Show Skeleton Loading
   container.innerHTML = `
-    <div class="post-card" style="opacity:0.5; padding:2rem; text-align:center;">
+    <div class="post-card" style="grid-column:1/-1; opacity:0.7; padding:2rem; text-align:center;">
       <i class="fa fa-spinner fa-spin fa-2x" style="color:var(--accent-primary)"></i>
       <p style="margin-top:1rem;">Loading posts from database...</p>
     </div>
@@ -85,7 +85,7 @@ async function fetchPosts(category = 'all', search = '') {
       renderFallbackPosts(category, search);
     }
   } catch (err) {
-    console.warn("API unavailable, displaying client fallback posts:", err.message);
+    console.warn("API unavailable, displaying fallback posts:", err.message);
     renderFallbackPosts(category, search);
   }
 }
@@ -102,7 +102,7 @@ function renderPosts(posts) {
 
     const card = document.createElement("article");
     card.className = `post-card ${categorySlug}`;
-    card.style.animationDelay = `${index * 0.1}s`;
+    card.style.animationDelay = `${index * 0.08}s`;
 
     card.innerHTML = `
       <img src="${cover}" alt="${post.title}" class="post-thumb" loading="lazy">
@@ -112,7 +112,7 @@ function renderPosts(posts) {
         <p class="post-excerpt">${post.summary}</p>
         <div class="post-footer">
           <span><i class="fa fa-clock"></i> ${post.readTimeMinutes || 3} min read</span>
-          <a href="post.html?slug=${postSlug}" class="read-more-btn">
+          <a href="post.html?slug=${encodeURIComponent(postSlug)}" class="read-more-btn">
             Read More <i class="fa fa-arrow-right"></i>
           </a>
         </div>
@@ -191,10 +191,10 @@ function renderFallbackPosts(category, search) {
 function filterPosts(category) {
   currentCategory = category;
 
-  // Highlight active filter button
+  // Highlight active filter button cleanly using data-category
   const buttons = document.querySelectorAll(".filter-btn");
   buttons.forEach(btn => {
-    if (btn.getAttribute("onclick")?.includes(`'${category}'`)) {
+    if (btn.dataset.category === category) {
       btn.classList.add("active");
     } else {
       btn.classList.remove("active");
@@ -212,7 +212,7 @@ async function initSinglePostPage() {
   const slug = urlParams.get("slug") || "my-first-blog";
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/posts/${slug}`);
+    const res = await fetch(`${API_BASE_URL}/api/posts/${encodeURIComponent(slug)}`);
     const result = await res.json();
 
     if (result.success && result.data) {
@@ -246,7 +246,7 @@ function renderSinglePost(post) {
   if (coverEl && post.coverImage) coverEl.src = post.coverImage;
   if (contentEl) contentEl.innerText = post.content;
 
-  // Load comments
+  // Load comments from API
   fetchComments(post._id);
 }
 
@@ -304,11 +304,13 @@ async function fetchComments(postId) {
         const item = document.createElement("div");
         item.className = "comment-item";
         item.innerHTML = `
-          <div class="comment-author">${c.authorDetails?.name || 'Reader'}</div>
-          <div class="comment-text">${c.content}</div>
+          <div class="comment-author">${escapeHTML(c.authorDetails?.name || 'Reader')}</div>
+          <div class="comment-text">${escapeHTML(c.content)}</div>
         `;
         container.appendChild(item);
       });
+    } else {
+      container.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem;">No comments yet. Be the first to share your thoughts!</p>`;
     }
   } catch (err) {
     console.warn("Could not fetch comments:", err.message);
@@ -327,39 +329,55 @@ async function addComment() {
     return;
   }
 
-  // Client DOM append
-  const container = document.getElementById("commentsList");
-  if (container) {
-    const commentBox = document.createElement("div");
-    commentBox.className = "comment-item";
-    commentBox.innerHTML = `<div class="comment-author">${name}</div><div class="comment-text">${content}</div>`;
-    container.prepend(commentBox);
-  }
-
-  // Send to API if connected
+  // Send to API first if connected
   if (currentPostId) {
     try {
-      await fetch(`${API_BASE_URL}/api/comments`, {
+      const res = await fetch(`${API_BASE_URL}/api/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId: currentPostId, name, content })
       });
+      const result = await res.json();
+
+      if (result.success) {
+        fetchComments(currentPostId);
+      } else {
+        alert(result.error || "Failed to post comment.");
+      }
     } catch (err) {
       console.warn("Comment saved locally:", err.message);
+      renderLocalComment(name, content);
     }
+  } else {
+    renderLocalComment(name, content);
   }
 
   if (nameEl) nameEl.value = "";
   if (contentEl) contentEl.value = "";
 }
 
+function renderLocalComment(name, content) {
+  const container = document.getElementById("commentsList");
+  if (container) {
+    const commentBox = document.createElement("div");
+    commentBox.className = "comment-item";
+    commentBox.innerHTML = `<div class="comment-author">${escapeHTML(name)}</div><div class="comment-text">${escapeHTML(content)}</div>`;
+    container.prepend(commentBox);
+  }
+}
+
 // --- Contact Form Submission (`contact.html`) ---
 async function validateForm(event) {
   if (event) event.preventDefault();
 
-  const name = document.getElementById("name")?.value.trim();
-  const email = document.getElementById("email")?.value.trim();
-  const message = document.getElementById("message")?.value.trim();
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const messageInput = document.getElementById("message");
+  const submitBtn = document.getElementById("submitContactBtn");
+
+  const name = nameInput?.value.trim();
+  const email = emailInput?.value.trim();
+  const message = messageInput?.value.trim();
 
   if (!name || !email || !message) {
     alert("Please complete all form fields.");
@@ -371,6 +389,11 @@ async function validateForm(event) {
     return false;
   }
 
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Sending...`;
+  }
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/contact`, {
       method: 'POST',
@@ -378,18 +401,47 @@ async function validateForm(event) {
       body: JSON.stringify({ name, email, message })
     });
     const result = await res.json();
-    alert(result.message || "Thank you! Message sent successfully.");
+
+    if (result.success) {
+      alert(result.message || "Thank you! Message sent successfully.");
+      if (nameInput) nameInput.value = "";
+      if (emailInput) emailInput.value = "";
+      if (messageInput) messageInput.value = "";
+    } else {
+      alert(result.error || "Failed to send message.");
+    }
   } catch (err) {
-    alert("Message sent successfully!");
+    console.error("Contact Form Error:", err);
+    alert("Unable to reach backend server. Please make sure server is running.");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i class="fa fa-paper-plane"></i> Send Message`;
+    }
   }
 
-  document.getElementById("name").value = "";
-  document.getElementById("email").value = "";
-  document.getElementById("message").value = "";
   return false;
 }
 
 // --- Admin Dashboard (`admin.html`) ---
+function switchAdminTab(tabName) {
+  const tabs = document.querySelectorAll(".admin-tab-content");
+  const buttons = document.querySelectorAll(".admin-tab-btn");
+
+  tabs.forEach(t => t.classList.remove("active"));
+  buttons.forEach(b => b.classList.remove("active"));
+
+  const targetTab = document.getElementById(`tab-${tabName}`);
+  if (targetTab) targetTab.classList.add("active");
+
+  const targetBtn = Array.from(buttons).find(b => b.getAttribute("onclick")?.includes(tabName));
+  if (targetBtn) targetBtn.classList.add("active");
+
+  if (tabName === 'manage-posts') {
+    fetchAdminPosts();
+  }
+}
+
 async function initAdminPage() {
   const tableBody = document.getElementById("adminMessagesBody");
   if (!tableBody) return;
@@ -404,15 +456,140 @@ async function initAdminPage() {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${idx + 1}</td>
-          <td><strong>${msg.name}</strong></td>
-          <td>${msg.email}</td>
-          <td>${msg.message}</td>
+          <td><strong>${escapeHTML(msg.name)}</strong></td>
+          <td>${escapeHTML(msg.email)}</td>
+          <td>${escapeHTML(msg.message)}</td>
           <td>${new Date(msg.createdAt).toLocaleDateString()}</td>
         `;
         tableBody.appendChild(row);
       });
+    } else {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">No visitor messages received yet.</td>
+        </tr>
+      `;
     }
   } catch (err) {
-    console.warn("API not reachable for admin messages.");
+    console.warn("API not reachable for admin messages:", err.message);
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Could not load messages. Server off or API error.</td>
+      </tr>
+    `;
   }
+}
+
+async function fetchAdminPosts() {
+  const tableBody = document.getElementById("adminPostsListBody");
+  if (!tableBody) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/posts`);
+    const result = await res.json();
+
+    if (result.success && result.data.length > 0) {
+      tableBody.innerHTML = "";
+      result.data.forEach((post, idx) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><img src="${post.coverImage || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;"></td>
+          <td><strong>${escapeHTML(post.title)}</strong></td>
+          <td><span class="post-badge">${post.categoryId?.name || 'Tech'}</span></td>
+          <td>${post.viewsCount || 0}</td>
+          <td>
+            <button class="btn-danger" onclick="deletePost('${post._id}')">
+              <i class="fa fa-trash"></i> Delete
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } else {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">No published blog posts found.</td>
+        </tr>
+      `;
+    }
+  } catch (err) {
+    console.error("Error fetching admin posts:", err);
+  }
+}
+
+async function handleCreatePost(event) {
+  if (event) event.preventDefault();
+
+  const title = document.getElementById("postTitleInput")?.value.trim();
+  const categoryName = document.getElementById("postCategorySelect")?.value;
+  const readTimeMinutes = parseInt(document.getElementById("postReadTimeInput")?.value) || 5;
+  const coverImage = document.getElementById("postCoverInput")?.value.trim();
+  const summary = document.getElementById("postSummaryInput")?.value.trim();
+  const content = document.getElementById("postContentInput")?.value.trim();
+
+  if (!title || !summary || !content) {
+    alert("Please fill in all required post fields.");
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/posts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        categoryName,
+        readTimeMinutes,
+        coverImage,
+        summary,
+        content
+      })
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      alert("🎉 Post published successfully!");
+      document.getElementById("createPostForm").reset();
+      switchAdminTab("manage-posts");
+    } else {
+      alert(result.error || "Failed to create post.");
+    }
+  } catch (err) {
+    console.error("Error creating post:", err);
+    alert("Could not reach backend server to publish post.");
+  }
+
+  return false;
+}
+
+async function deletePost(postId) {
+  if (!confirm("Are you sure you want to delete this post?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+      method: 'DELETE'
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      alert("Post deleted successfully.");
+      fetchAdminPosts();
+    } else {
+      alert(result.error || "Failed to delete post.");
+    }
+  } catch (err) {
+    console.error("Error deleting post:", err);
+  }
+}
+
+// Utility: Escape HTML strings to prevent XSS
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }

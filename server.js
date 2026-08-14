@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -16,18 +17,43 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve frontend static files
-app.use(express.static(__dirname));
+// Serve static frontend assets safely from public/ directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Import Models
 const Post = require('./models/Post');
 const Category = require('./models/Category');
 const Comment = require('./models/Comment');
 const ContactMessage = require('./models/ContactMessage');
+const User = require('./models/User');
+
+// Helper function to generate slug
+const slugify = (text) => {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\W-]+/g, '-');
+};
+
+// Helper function to get default admin user ID
+const getDefaultAuthorId = async () => {
+  let admin = await User.findOne({ role: 'admin' });
+  if (!admin) {
+    admin = await User.create({
+      username: 'admin',
+      email: 'admin@myblog.com',
+      passwordHash: 'admin123',
+      role: 'admin',
+      profile: { fullName: 'Blog Admin' }
+    });
+  }
+  return admin._id;
+};
 
 // ==================== API ROUTES ====================
 
-// 1. GET /api/posts - Fetch all published posts (with optional category filter & search query)
+// 1. GET /api/posts - Fetch published posts (with category filter & search)
 app.get('/api/posts', async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -41,7 +67,8 @@ app.get('/api/posts', async (req, res) => {
     }
 
     if (search) {
-      query.$text = { $search: search };
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [{ title: searchRegex }, { summary: searchRegex }];
     }
 
     const posts = await Post.find(query)
@@ -55,10 +82,14 @@ app.get('/api/posts', async (req, res) => {
   }
 });
 
-// 2. GET /api/posts/:slug - Fetch single post by slug
+// 2. GET /api/posts/:slug - Fetch single post by slug & atomic view increment
 app.get('/api/posts/:slug', async (req, res) => {
   try {
-    const post = await Post.findOne({ slug: req.params.slug, status: 'published' })
+    const post = await Post.findOneAndUpdate(
+      { slug: req.params.slug, status: 'published' },
+      { $inc: { viewsCount: 1 } },
+      { new: true }
+    )
       .populate('categoryId', 'name slug')
       .populate('authorId', 'username profile');
 
@@ -66,17 +97,76 @@ app.get('/api/posts/:slug', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Blog post not found' });
     }
 
-    // Increment views count atomically
-    post.viewsCount += 1;
-    await post.save();
-
     res.json({ success: true, data: post });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// 3. GET /api/categories - Fetch categories
+// 3. POST /api/posts - Create a new blog post (Admin / Author endpoint)
+app.post('/api/posts', async (req, res) => {
+  try {
+    const { title, categoryName, summary, content, coverImage, readTimeMinutes } = req.body;
+
+    if (!title || !summary || !content) {
+      return res.status(400).json({ success: false, error: 'Please provide title, summary, and content' });
+    }
+
+    let slug = slugify(title);
+    const existingPost = await Post.findOne({ slug });
+    if (existingPost) {
+      slug = `${slug}-${Date.now()}`;
+    }
+
+    // Find or create Category
+    const catName = categoryName || 'Tech';
+    let catObj = await Category.findOne({ name: catName });
+    if (!catObj) {
+      catObj = await Category.create({
+        name: catName,
+        slug: slugify(catName),
+        description: `${catName} category articles`
+      });
+    }
+
+    const authorId = await getDefaultAuthorId();
+
+    const newPost = await Post.create({
+      title,
+      slug,
+      summary,
+      content,
+      coverImage: coverImage || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
+      categoryId: catObj._id,
+      authorId,
+      readTimeMinutes: readTimeMinutes || 3,
+      status: 'published'
+    });
+
+    res.status(201).json({ success: true, message: 'Blog post created successfully!', data: newPost });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 4. DELETE /api/posts/:id - Delete a blog post by ID
+app.delete('/api/posts/:id', async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) {
+      return res.status(404).json({ success: false, error: 'Post not found' });
+    }
+
+    // Also delete associated comments
+    await Comment.deleteMany({ postId: req.params.id });
+
+    res.json({ success: true, message: 'Post and comments deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 5. GET /api/categories - Fetch categories
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await Category.find().sort({ name: 1 });
@@ -86,7 +176,7 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
-// 4. GET & POST /api/comments - Fetch and add comments
+// 6. GET & POST /api/comments - Fetch and add comments
 app.get('/api/comments/:postId', async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId, isApproved: true })
@@ -120,7 +210,7 @@ app.post('/api/comments', async (req, res) => {
   }
 });
 
-// 5. POST /api/contact - Submit contact form message
+// 7. POST /api/contact - Submit contact form message
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -136,7 +226,7 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-// 6. GET /api/admin/messages - Fetch all contact messages for admin
+// 8. GET /api/admin/messages - Fetch all contact messages for admin
 app.get('/api/admin/messages', async (req, res) => {
   try {
     const messages = await ContactMessage.find().sort({ createdAt: -1 });

@@ -418,6 +418,7 @@ body.dark .post-badge {
   line-height: 1.8;
   color: var(--text-secondary);
   margin-bottom: 3rem;
+  white-space: pre-line;
 }
 
 .post-body p {
@@ -487,6 +488,22 @@ textarea.form-control {
   transform: translateY(-1px);
 }
 
+.btn-danger {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-danger:hover {
+  opacity: 0.88;
+}
+
 .comments-list {
   display: flex;
   flex-direction: column;
@@ -534,6 +551,44 @@ textarea.form-control {
 }
 
 /* Admin Dashboard (`admin.html`) */
+.admin-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.admin-tab-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-tab-btn:hover, .admin-tab-btn.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+}
+
+.admin-tab-content {
+  display: none;
+}
+
+.admin-tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -575,6 +630,11 @@ footer {
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   header {
@@ -589,5 +649,9 @@ footer {
 
   .posts-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-tabs {
+    flex-direction: column;
   }
 }

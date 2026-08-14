@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - My Blog</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-code"></i> My Blog Admin
+        </a>
+
+        <nav>
+            <a href="index.html"><i class="fa fa-home"></i> Home</a>
+            <a href="about.html"><i class="fa fa-user"></i> About</a>
+            <a href="contact.html"><i class="fa fa-envelope"></i> Contact</a>
+            <a href="admin.html" class="active"><i class="fa fa-shield-halved"></i> Admin</a>
+        </nav>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleDarkMode()">
+            <i class="fa fa-moon"></i> Dark Mode
+        </button>
+    </header>
+
+    <main class="container">
+        <div style="margin-bottom:2rem; text-align:center;">
+            <h2><i class="fa fa-gauge-high" style="color:var(--accent-primary)"></i> Admin Control Panel</h2>
+            <p style="color:var(--text-secondary);">Manage blog posts, view visitor contact messages, and monitor site metrics.</p>
+        </div>
+
+        <!-- Admin Tab Navigation -->
+        <div class="admin-tabs">
+            <button class="admin-tab-btn active" onclick="switchAdminTab('messages')">
+                <i class="fa fa-inbox"></i> Messages Inbox
+            </button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('create-post')">
+                <i class="fa fa-plus-circle"></i> Create New Post
+            </button>
+            <button class="admin-tab-btn" onclick="switchAdminTab('manage-posts')">
+                <i class="fa fa-newspaper"></i> Manage Posts
+            </button>
+        </div>
+
+        <!-- TAB 1: Messages Inbox -->
+        <section id="tab-messages" class="admin-tab-content active">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h3><i class="fa fa-envelope-open-text"></i> Visitor Messages</h3>
+                <button class="filter-btn" onclick="initAdminPage()"><i class="fa fa-rotate"></i> Refresh</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sender Name</th>
+                            <th>Email Address</th>
+                            <th>Message Content</th>
+                            <th>Received Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminMessagesBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">
+                                <i class="fa fa-spinner fa-spin"></i> Loading messages from database...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 2: Create New Post -->
+        <section id="tab-create-post" class="admin-tab-content">
+            <div class="card-box" style="max-width:800px; margin:0 auto;">
+                <h3><i class="fa fa-pen-to-square" style="color:var(--accent-primary)"></i> Publish a New Blog Post</h3>
+                <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Fill in the details below to add a new article directly to MongoDB.</p>
+
+                <form id="createPostForm" onsubmit="return handleCreatePost(event)">
+                    <div style="margin-bottom:1.2rem;">
+                        <label for="postTitleInput" style="font-weight:600; display:block; margin-bottom:0.4rem;">Post Title</label>
+                        <input type="text" id="postTitleInput" class="form-control" placeholder="e.g. Master TypeScript in 30 Days" required>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.2rem;">
+                        <div>
+                            <label for="postCategorySelect" style="font-weight:600; display:block; margin-bottom:0.4rem;">Category</label>
+                            <select id="postCategorySelect" class="form-control" required>
+                                <option value="Tech">Tech</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="postReadTimeInput" style="font-weight:600; display:block; margin-bottom:0.4rem;">Read Time (mins)</label>
+                            <input type="number" id="postReadTimeInput" class="form-control" value="5" min="1" required>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:1.2rem;">
+                        <label for="postCoverInput" style="font-weight:600; display:block; margin-bottom:0.4rem;">Cover Image URL</label>
+                        <input type="url" id="postCoverInput" class="form-control" placeholder="https://images.unsplash.com/photo-..." required>
+                    </div>
+
+                    <div style="margin-bottom:1.2rem;">
+                        <label for="postSummaryInput" style="font-weight:600; display:block; margin-bottom:0.4rem;">Summary / Excerpt</label>
+                        <textarea id="postSummaryInput" class="form-control" style="min-height:70px;" placeholder="Short summary for post cards on home page..." required></textarea>
+                    </div>
+
+                    <div style="margin-bottom:1.5rem;">
+                        <label for="postContentInput" style="font-weight:600; display:block; margin-bottom:0.4rem;">Full Article Content</label>
+                        <textarea id="postContentInput" class="form-control" style="min-height:180px;" placeholder="Write full post content here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width:100%;">
+                        <i class="fa fa-paper-plane"></i> Publish Blog Post
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 3: Manage Existing Posts -->
+        <section id="tab-manage-posts" class="admin-tab-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h3><i class="fa fa-list-check"></i> Published Articles</h3>
+                <button class="filter-btn" onclick="fetchAdminPosts()"><i class="fa fa-rotate"></i> Refresh</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cover</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Views</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminPostsListBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">
+                                <i class="fa fa-spinner fa-spin"></i> Loading articles...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Blog | Admin Management</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
